@@ -1,15 +1,53 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model User {
+  id String @id @default(uuid())
+  name String
+  email String @unique
+  password String
+  albums Album[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+model Album {
+  id String @id @default(uuid())
+  title String
+  description String?
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  photos Photo[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@map("albums")
+}
+
+model Photo {
+  id String @id @default(uuid())
+  title String
+  description String?
+  filename String
+  filepath String
+  mimetype String
+  size Int
+  acquisitionDate DateTime
+  dominantColor String
+  albumId String
+  album Album @relation(fields: [albumId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([albumId])
+  @@map("photos")
 }
