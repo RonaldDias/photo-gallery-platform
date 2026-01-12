@@ -1,0 +1,68 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: photo-gallery-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: photo-gallery
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - photo-gallery-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: photo-gallery-backend
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/photo_gallery?schema=public
+      PORT: 3001
+      NODE_ENV: development
+      JWT_SECRET: chave-secreta-mudar-em-prod
+      JWT_EXPIRES_IN: 7d
+      MAX_FILE_SIZE: 10485760
+      ALLOWED_MIME_TYPES: image/jpeg,image/jpg,image/png
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+      - ./backend/uploads:/app/uploads
+    depends_on:
+      - postgres
+    networks:
+      - photo-gallery-network
+    command: sh -c "npx prisma migrate deploy && npm run dev"
+
+  #frontend:
+  #build:
+  #context: ./frontend
+  #dockerfile: Dockerfile
+  #container_name: photo-gallery-frontend
+  #restart: unless-stopped
+  #ports:
+  #- "5173:5173"
+  #volumes:
+  #- ./frontend:/app
+  #- /app/node_modules
+  #depends_on:
+  #- backend
+  #networks:
+  #- photo-gallery-network
+  #environment:
+  #- VITE_API_URL: http://localhost:3001
+
+volumes:
+  postgres_data:
+
+networks:
+  photo-gallery-network:
+    driver: bridge

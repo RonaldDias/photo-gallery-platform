@@ -48,19 +48,38 @@ cd photo-gallery-platform
 2. Configure as variáveis de ambiente:
 
 ```bash
-cp backend/.env.example backend/.env
+cp backend/.env
 ```
 
 3. Inicie os containers:
 
 ```bash
-docker-compose up
+docker compose up
 ```
 
-4. Acesse:
+4. Em outro terminal, rode as migrations:
+
+```bash
+docker compose exec backend npx prisma migrate dev
+```
+
+5. Acesse:
 
 - Frontend: http://localhost:5173
 - Backend: http://localhost:3001
+- Postgres: localhost:5432
+
+## Parar os containers
+
+```bash
+docker-compose down
+```
+
+## Limpar tudo (cuidado: apaga o banco)
+
+```bash
+docker-compose down -v
+```
 
 ## Como Rodar sem Docker
 
