@@ -2,6 +2,7 @@ import { Response } from "express";
 import { AuthRequest } from "../middlewares/auth.middleware";
 import * as photosService from "../services/photos.service";
 import * as albumsService from "../services/albums.service";
+import * as imageProcessingService from "../services/imageProcessing.service";
 
 export const uploadPhoto = async (req: AuthRequest, res: Response) => {
   try {
@@ -23,6 +24,13 @@ export const uploadPhoto = async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ erro: "Álbum não encontrado" });
     }
 
+    const dominantColor = await imageProcessingService.extractDominantColor(
+      req.file.path
+    );
+    const acquisitionDate = await imageProcessingService.extractExifDate(
+      req.file.path
+    );
+
     const photoData = {
       title,
       description,
@@ -30,8 +38,8 @@ export const uploadPhoto = async (req: AuthRequest, res: Response) => {
       filepath: req.file.path,
       mimetype: req.file.mimetype,
       size: req.file.size,
-      acquisitionDate: new Date(),
-      dominantColor: "#000000",
+      acquisitionDate,
+      dominantColor,
       albumId,
     };
 
