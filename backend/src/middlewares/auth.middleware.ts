@@ -12,13 +12,13 @@ export const authMiddleware = (
   next: NextFunction
 ) => {
   try {
-    const authHeader = req.headers.authorization;
-
+    let authHeader = req.headers.authorization;
     if (!authHeader) {
       return res.status(401).json({ erro: "Token não fornecido" });
     }
 
-    const parts = authHeader.split("");
+    const headerValue = Array.isArray(authHeader) ? authHeader[0] : authHeader;
+    const parts = authHeader.split(" ");
 
     if (parts.length !== 2) {
       return res.status(401).json({ erro: "Formato de token inválido" });
