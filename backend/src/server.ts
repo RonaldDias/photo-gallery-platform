@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import authRoutes from "./routes/auth.routes";
 import albumsRoutes from "./routes/albums.routes";
+import photosRoutes from "./routes/photos.routes";
 
 dotenv.config();
 
@@ -19,6 +20,7 @@ app.get("/health", (req, res) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/albuns", albumsRoutes);
+app.use("/api/albuns", photosRoutes);
 
 app.listen(PORT, () => {
   console.log(`Servidor rodando em http://localhost:${PORT}`);
