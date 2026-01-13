@@ -1,3 +1,5 @@
+import fs from "fs";
+import path from "path";
 import { Response } from "express";
 import { AuthRequest } from "../middlewares/auth.middleware";
 import * as photosService from "../services/photos.service";
@@ -68,6 +70,27 @@ export const listPhotos = async (req: AuthRequest, res: Response) => {
     if (error instanceof Error) {
       return res.status(404).json({ erro: error.message });
     }
+    return res.status(500).json({ erro: "Erro interno do servidor" });
+  }
+};
+
+export const deletePhoto = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user!.userId;
+    const photoId = req.params.id as string;
+
+    const result = await photosService.deletePhoto(photoId, userId);
+
+    if (fs.existsSync(result.filepath)) {
+      fs.unlinkSync(result.filepath);
+    }
+
+    return res.status(200).json({ message: "Foto deletada com sucesso!" });
+  } catch (error) {
+    if (error instanceof Error) {
+      return res.status(400).json({ erro: error.message });
+    }
+
     return res.status(500).json({ erro: "Erro interno do servidor" });
   }
 };
