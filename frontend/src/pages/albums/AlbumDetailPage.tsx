@@ -5,6 +5,9 @@ import { Modal } from "../../components/common/Modal";
 import { ConfirmModal } from "../../components/common/ConfirmModal";
 import { AlbumForm } from "../../components/albums/AlbumForm";
 import { type AlbumFormData, type Album } from "../../types/album.types";
+import { PhotoUpload } from "../../components/photos/PhotoUpload";
+import { photoService } from "../../services/photoService";
+import { type Photo } from "../../types/photo.types";
 
 export const AlbumDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -15,10 +18,13 @@ export const AlbumDetailPage = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [photos, setPhotos] = useState<Photo[]>([]);
+  const [isLoadingPhotos, setIsLoadingPhotos] = useState(false);
 
   useEffect(() => {
     if (id) {
       loadAlbum();
+      loadPhotos();
     }
   }, [id]);
 
@@ -34,6 +40,20 @@ export const AlbumDetailPage = () => {
       navigate("/albuns");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const loadPhotos = async () => {
+    if (!id) return;
+
+    try {
+      setIsLoadingPhotos(true);
+      const data = await photoService.getPhotosByAlbum(id);
+      setPhotos(data);
+    } catch (error) {
+      console.error("Erro ao carregar fotos:", error);
+    } finally {
+      setIsLoadingPhotos(false);
     }
   };
 
@@ -117,9 +137,30 @@ export const AlbumDetailPage = () => {
 
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Fotos</h2>
-          <div className="text-center py-12 text-gray-500">
-            <p>Área de fotos será implementada na próxima issue</p>
-          </div>
+
+          <PhotoUpload albumId={id!} onUploadSuccess={loadPhotos} />
+
+          {isLoadingPhotos ? (
+            <div className="text-center py-8 text-gray-500">
+              Carregando fotos...
+            </div>
+          ) : photos.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              Nenhuma foto neste álbum ainda
+            </div>
+          ) : (
+            <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
+              {photos.map((photo) => (
+                <div key={photo.id} className="relative group">
+                  <img
+                    src={`http://localhost:3001/uploads/${photo.filename}`}
+                    alt={photo.originalName}
+                    className="w-full h-32 object-cover rounded-lg"
+                  />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 

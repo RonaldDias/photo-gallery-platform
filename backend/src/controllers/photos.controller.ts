@@ -56,6 +56,56 @@ export const uploadPhoto = async (req: AuthRequest, res: Response) => {
   }
 };
 
+export const uploadPhotos = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user!.userId;
+    const albumId = req.params.albumId as string;
+
+    if (!req.files || !Array.isArray(req.files) || req.files.length === 0) {
+      return res.status(400).json({ erro: "Nenhum arquivo enviado" });
+    }
+
+    const album = await albumsService.getAlbumById(albumId, userId);
+
+    if (!album) {
+      return res.status(404).json({ erro: "Álbum não encontrado" });
+    }
+
+    const uploadedPhotos = [];
+
+    for (const file of req.files) {
+      const dominantColor = await imageProcessingService.extractDominantColor(
+        file.path
+      );
+      const acquisitionDate = await imageProcessingService.extractExifDate(
+        file.path
+      );
+
+      const photoData = {
+        title: file.originalname,
+        description: undefined,
+        filename: file.filename,
+        filepath: file.path,
+        mimetype: file.mimetype,
+        size: file.size,
+        acquisitionDate,
+        dominantColor,
+        albumId,
+      };
+
+      const photo = await photosService.createPhoto(photoData);
+      uploadedPhotos.push(photo);
+    }
+
+    return res.status(201).json(uploadedPhotos);
+  } catch (error) {
+    if (error instanceof Error) {
+      return res.status(400).json({ erro: error.message });
+    }
+    return res.status(500).json({ erro: "Erro interno do servidor" });
+  }
+};
+
 export const listPhotos = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user!.userId;

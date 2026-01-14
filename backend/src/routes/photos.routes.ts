@@ -9,8 +9,8 @@ router.use(authMiddleware);
 
 router.post(
   "/:albumId/fotos",
-  upload.single("photo"),
-  photosController.uploadPhoto
+  upload.array("fotos", 10),
+  photosController.uploadPhotos
 );
 router.get("/:albumId/fotos", photosController.listPhotos);
 
