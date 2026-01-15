@@ -5,6 +5,7 @@ import { RegisterPage } from "./pages/auth/RegisterPage";
 import { AlbumsListPage } from "./pages/albums/AlbumsListPage";
 import { AlbumDetailPage } from "./pages/albums/AlbumDetailPage";
 import { ProtectedRoute } from "./components/common/ProtectedRoute";
+import { Layout } from "./components/layout/Layout";
 
 function App() {
   return (
@@ -18,7 +19,9 @@ function App() {
             path="/albuns"
             element={
               <ProtectedRoute>
-                <AlbumsListPage />
+                <Layout>
+                  <AlbumsListPage />
+                </Layout>
               </ProtectedRoute>
             }
           />
@@ -27,7 +30,9 @@ function App() {
             path="/albuns/:id"
             element={
               <ProtectedRoute>
-                <AlbumDetailPage />
+                <Layout>
+                  <AlbumDetailPage />
+                </Layout>
               </ProtectedRoute>
             }
           ></Route>

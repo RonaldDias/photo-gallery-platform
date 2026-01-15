@@ -132,7 +132,7 @@ export const AlbumDetailPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div>
       <div className="max-w-7xl mx-auto p-8">
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
           <button
