@@ -13,7 +13,7 @@ export const PhotoGrid = ({ photos, onDelete }: PhotoGridProps) => {
           <div className="aspect-square overflow-hidden rounded-lg bg-gray-100">
             <img
               src={`http://localhost:3001/uploads/${photo.filename}`}
-              alt={photo.originalName}
+              alt={photo.title}
               className="w-full h-full object-cover transition-transform group-hover:scale-110"
             />
           </div>
@@ -34,9 +34,7 @@ export const PhotoGrid = ({ photos, onDelete }: PhotoGridProps) => {
             />
           )}
 
-          <p className="mt-2 text-sm text-gray-700 truncate">
-            {photo.originalName}
-          </p>
+          <p className="mt-2 text-sm text-gray-700 truncate">{photo.title}</p>
         </div>
       ))}
     </div>

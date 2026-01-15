@@ -28,6 +28,7 @@ export const AlbumDetailPage = () => {
   });
   const [photoToDelete, setPhotoToDelete] = useState<Photo | null>(null);
   const [isDeletePhotoModalOpen, setIsDeletePhotoModalOpen] = useState(false);
+  const [photoToDeleteName, setPhotoToDeleteName] = useState("");
 
   useEffect(() => {
     if (id) {
@@ -93,6 +94,7 @@ export const AlbumDetailPage = () => {
 
   const openDeletePhotoModal = (photo: Photo) => {
     setPhotoToDelete(photo);
+    setPhotoToDeleteName(photo.title);
     setIsDeletePhotoModalOpen(true);
   };
 
@@ -243,7 +245,7 @@ export const AlbumDetailPage = () => {
         }}
         onConfirm={handleDeletePhoto}
         title="Deletar Foto"
-        message={`Tem certeza que deseja deletar a foto "${photoToDelete?.originalName}"? Esta ação não pode ser desfeita.`}
+        message={`Tem certeza que deseja deletar a foto "${photoToDeleteName}"? Esta ação não pode ser desfeita.`}
         isLoading={isSubmitting}
       />
     </div>

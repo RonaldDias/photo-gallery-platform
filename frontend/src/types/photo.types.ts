@@ -3,7 +3,8 @@ import { z } from "zod";
 export interface Photo {
   id: string;
   filename: string;
-  originalName: string;
+  title: string;
+  description: string | null;
   mimeType: string;
   size: number;
   dominantColor: string | null;

@@ -38,13 +38,13 @@ export const PhotoTable = ({ photos, onDelete }: PhotoTableProps) => {
               <td className="px-6 py-4 whitespace-nowrap">
                 <img
                   src={`http://localhost:3001/uploads/${photo.filename}`}
-                  alt={photo.originalName}
+                  alt={photo.title}
                   className="h-12 w-12 rounded object-cover"
                 />
               </td>
               <td className="px-6 py-4">
                 <div className="text-sm font-medium text-gray-900 max-w-xs truncate">
-                  {photo.originalName}
+                  {photo.title}
                 </div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
