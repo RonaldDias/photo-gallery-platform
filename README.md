@@ -210,8 +210,9 @@ DELETE /api/fotos/:id               - Deletar foto
 
 Todas as rotas (exceto auth) requerem header:
 Authorization: Bearer <token>
+```
 
-## Testando a Aplicação
+### Testando a Aplicação
 
 ### 1. Criar conta
 - Acesse http://localhost:5173/cadastro
@@ -242,3 +243,4 @@ Authorization: Bearer <token>
 
 MIT
 ```
+
