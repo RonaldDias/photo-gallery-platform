@@ -12,6 +12,8 @@ Plataforma web responsiva para gerenciamento de álbuns e fotos com autenticaç�
 - Tailwind CSS
 - React Router
 - React Hook Form + Zod
+- React Dropzone
+- React Hot Toast
 - Axios
 
 ### Backend
@@ -24,11 +26,13 @@ Plataforma web responsiva para gerenciamento de álbuns e fotos com autenticaç�
 - JWT
 - Multer
 - Sharp
+- exif-parser
 
 ### DevOps
 
 - Docker
 - Docker Compose
+- PostgreSQL containerizado
 
 ## Pré-requisitos
 
@@ -178,6 +182,63 @@ Consulte o arquivo `backend/.env.example` para ver todas as variáveis necessár
 - Visualização em grid e tabela
 - Responsivo para mobile e desktop
 
+### Endpoints da API
+
+### Autenticação
+
+```
+POST   /api/auth/cadastro      - Criar conta
+POST   /api/auth/login         - Fazer login
+```
+
+### Álbuns
+
+```
+GET    /api/albuns             - Listar álbuns do usuário
+POST   /api/albuns             - Criar álbum
+GET    /api/albuns/:id         - Detalhes do álbum
+PUT    /api/albuns/:id         - Editar álbum
+DELETE /api/albuns/:id         - Deletar álbum
+```
+
+### Fotos
+
+```
+POST   /api/albuns/:albumId/fotos  - Upload de fotos
+GET    /api/albuns/:albumId/fotos  - Listar fotos do álbum
+DELETE /api/fotos/:id               - Deletar foto
+
+Todas as rotas (exceto auth) requerem header:
+Authorization: Bearer <token>
+
+## Testando a Aplicação
+
+### 1. Criar conta
+- Acesse http://localhost:5173/cadastro
+- Preencha: nome, email, senha
+- Clique em "Criar Conta"
+
+### 2. Criar álbum
+- Na página de álbuns, clique em "Novo Álbum"
+- Preencha título e descrição
+- Salve
+
+### 3. Upload de fotos
+- Entre no álbum criado
+- Arraste fotos para a área de upload
+- Clique em "Enviar Fotos"
+- Veja as cores predominantes e datas extraídas!
+
+### 4. Visualizações
+- Alterne entre Grid e Tabela
+- Na tabela, veja as cores e datas formatadas
+
+### 5. Delete
+- Tente deletar um álbum com fotos → erro esperado
+- Delete fotos individuais
+- Delete o álbum vazio
+
 ## Licença
 
 MIT
+```
