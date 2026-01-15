@@ -4,6 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { type RegisterFormData, registerSchema } from "../../types/auth.types";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { showError, showSuccess } from "../../utils/toast";
 
 export const RegisterPage = () => {
   const [error, setError] = useState("");
@@ -22,9 +23,14 @@ export const RegisterPage = () => {
     setError("");
     try {
       await registerUser(data.nome, data.email, data.senha);
+      showSuccess("Conta criada com sucesso!");
       navigate("/albuns");
     } catch (err: any) {
-      setError(err.response?.data?.mensagem || "Erro ao criar conta");
+      const errorMessage =
+        err.response?.data?.mensagem || "Erro ao criar conta";
+
+      setError(errorMessage);
+      showError(errorMessage);
     }
   };
 

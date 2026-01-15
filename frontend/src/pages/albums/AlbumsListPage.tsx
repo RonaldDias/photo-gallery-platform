@@ -6,6 +6,7 @@ import { AlbumCard } from "../../components/albums/AlbumCard";
 import { Modal } from "../../components/common/Modal";
 import { ConfirmModal } from "../../components/common/ConfirmModal";
 import { AlbumForm } from "../../components/albums/AlbumForm";
+import { showError, showSuccess } from "../../utils/toast";
 
 export const AlbumsListPage = () => {
   const [albums, setAlbums] = useState<Album[]>([]);
@@ -39,10 +40,18 @@ export const AlbumsListPage = () => {
     try {
       setIsSubmitting(true);
       await albumService.create(data);
+      showSuccess("Álbum criado com sucesso!");
       await loadAlbums();
       setIsCreateModalOpen(false);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao criar álbum:", error);
+
+      const errorMessage =
+        error.response?.data?.erro ||
+        error.response?.data?.message ||
+        "Erro ao criar álbum";
+
+      showError(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -54,11 +63,19 @@ export const AlbumsListPage = () => {
     try {
       setIsSubmitting(true);
       await albumService.update(selectedAlbum.id, data);
+      showSuccess("Álbum atualizado com sucesso!");
       await loadAlbums();
       setIsEditModalOpen(false);
       setSelectedAlbum(null);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao editar álbum:", error);
+
+      const errorMessage =
+        error.response?.data?.erro ||
+        error.response?.data?.message ||
+        "Erro ao atualizar álbum";
+
+      showError(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -70,11 +87,19 @@ export const AlbumsListPage = () => {
     try {
       setIsSubmitting(true);
       await albumService.delete(selectedAlbum.id);
+      showSuccess("Álbum deletado com sucesso!");
       await loadAlbums();
       setIsDeleteModalOpen(false);
       setSelectedAlbum(null);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao deletar álbum:", error);
+
+      const errorMessage =
+        error.response?.data?.erro ||
+        error.response?.data?.message ||
+        "Erro ao deletar álbum";
+
+      showError(errorMessage);
     } finally {
       setIsSubmitting(false);
     }

@@ -4,6 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import { loginSchema, type LoginFormData } from "../../types/auth.types";
+import { showError, showSuccess } from "../../utils/toast";
 
 export const LoginPage = () => {
   const [error, setError] = useState("");
@@ -22,9 +23,14 @@ export const LoginPage = () => {
     setError("");
     try {
       await login(data.email, data.senha);
+      showSuccess("Login realizado com sucesso!");
       navigate("/albuns");
     } catch (err: any) {
-      setError(err.response?.data?.mensagem || "Erro ao fazer login");
+      const errorMessage =
+        err.response?.data?.mensagem || "Erro ao fazer login";
+
+      setError(errorMessage);
+      showError(errorMessage);
     }
   };
 

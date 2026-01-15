@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useDropzone } from "react-dropzone";
+import { showError, showSuccess } from "../../utils/toast";
 
 interface PhotoUploadProps {
   albumId: string;
@@ -72,14 +73,18 @@ export const PhotoUpload = ({ albumId, onUploadSuccess }: PhotoUploadProps) => {
         throw new Error("Erro ao fazer upload");
       }
 
-      setSuccess(`${selectedFiles.length} foto(s) enviada(s) com sucesso!`);
+      const successMessage = `${selectedFiles.length} foto(s) enviada(s) com sucesso!`;
+      showSuccess(successMessage);
+      setSuccess(successMessage);
       setSelectedFiles([]);
       setPreviews([]);
       onUploadSuccess();
 
       setTimeout(() => setSuccess(""), 3000);
     } catch (err) {
-      setError("Erro ao fazer upload das fotos");
+      const errorMessage = "Erro ao fazer upload das fotos";
+      showError(errorMessage);
+      setError(errorMessage);
     } finally {
       setIsUploading(false);
     }

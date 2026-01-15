@@ -10,6 +10,7 @@ import { type Album, type AlbumFormData } from "../../types/album.types";
 import { type Photo } from "../../types/photo.types";
 import { PhotoGrid } from "../../components/photos/PhotoGrid";
 import { PhotoTable } from "../../components/photos/PhotoTable";
+import { showSuccess, showError } from "../../utils/toast";
 
 export const AlbumDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -70,10 +71,18 @@ export const AlbumDetailPage = () => {
     try {
       setIsSubmitting(true);
       await albumService.update(id, data);
+      showSuccess("Álbum atualiazdo com sucesso!");
       await loadAlbum();
       setIsEditModalOpen(false);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao editar álbum:", error);
+
+      const errorMessage =
+        error.response?.data?.erro ||
+        error.response?.data?.message ||
+        "Erro ao atualizar álbum";
+
+      showError(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -85,9 +94,17 @@ export const AlbumDetailPage = () => {
     try {
       setIsSubmitting(true);
       await albumService.delete(id);
+      showSuccess("Álbum deletado com sucesso!");
       navigate("/albuns");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao deletar álbum:", error);
+
+      const errorMessage =
+        error.response?.data?.erro ||
+        error.response?.data?.message ||
+        "Erro ao deletar álbum";
+
+      showError(errorMessage);
       setIsSubmitting(false);
     }
   };
@@ -104,11 +121,19 @@ export const AlbumDetailPage = () => {
     try {
       setIsSubmitting(true);
       await photoService.deletePhoto(photoToDelete.id);
+      showSuccess("Foto deletada com sucesso!");
       await loadPhotos();
       setIsDeletePhotoModalOpen(false);
       setPhotoToDelete(null);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao deletar foto:", error);
+
+      const errorMessage =
+        error.response?.data?.erro ||
+        error.response?.data?.message ||
+        "Erro ao deletar foto";
+
+      showError(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
