@@ -1,13 +1,15 @@
-import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { albumService } from "../../services/albumService";
-import { Modal } from "../../components/common/Modal";
-import { ConfirmModal } from "../../components/common/ConfirmModal";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { AlbumForm } from "../../components/albums/AlbumForm";
-import { type AlbumFormData, type Album } from "../../types/album.types";
+import { ConfirmModal } from "../../components/common/ConfirmModal";
+import { Modal } from "../../components/common/Modal";
 import { PhotoUpload } from "../../components/photos/PhotoUpload";
+import { albumService } from "../../services/albumService";
 import { photoService } from "../../services/photoService";
+import { type Album, type AlbumFormData } from "../../types/album.types";
 import { type Photo } from "../../types/photo.types";
+import { PhotoGrid } from "../../components/photos/PhotoGrid";
+import { PhotoTable } from "../../components/photos/PhotoTable";
 
 export const AlbumDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -19,7 +21,13 @@ export const AlbumDetailPage = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [photos, setPhotos] = useState<Photo[]>([]);
-  const [isLoadingPhotos, setIsLoadingPhotos] = useState(false);
+  const [viewMode, setViewMode] = useState<"grid" | "table">(() => {
+    return (
+      (localStorage.getItem("photoViewMode") as "grid" | "table") || "grid"
+    );
+  });
+  const [photoToDelete, setPhotoToDelete] = useState<Photo | null>(null);
+  const [isDeletePhotoModalOpen, setIsDeletePhotoModalOpen] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -47,13 +55,11 @@ export const AlbumDetailPage = () => {
     if (!id) return;
 
     try {
-      setIsLoadingPhotos(true);
       const data = await photoService.getPhotosByAlbum(id);
       setPhotos(data);
     } catch (error) {
       console.error("Erro ao carregar fotos:", error);
     } finally {
-      setIsLoadingPhotos(false);
     }
   };
 
@@ -83,6 +89,32 @@ export const AlbumDetailPage = () => {
       console.error("Erro ao deletar álbum:", error);
       setIsSubmitting(false);
     }
+  };
+
+  const openDeletePhotoModal = (photo: Photo) => {
+    setPhotoToDelete(photo);
+    setIsDeletePhotoModalOpen(true);
+  };
+
+  const handleDeletePhoto = async () => {
+    if (!photoToDelete) return;
+
+    try {
+      setIsSubmitting(true);
+      await photoService.deletePhoto(photoToDelete.id);
+      await loadPhotos();
+      setIsDeletePhotoModalOpen(false);
+      setPhotoToDelete(null);
+    } catch (error) {
+      console.error("Erro ao deletar foto:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleViewModeChange = (mode: "grid" | "table") => {
+    setViewMode(mode);
+    localStorage.setItem("photoViewMode", mode);
   };
 
   if (isLoading) {
@@ -140,25 +172,42 @@ export const AlbumDetailPage = () => {
 
           <PhotoUpload albumId={id!} onUploadSuccess={loadPhotos} />
 
-          {isLoadingPhotos ? (
-            <div className="text-center py-8 text-gray-500">
-              Carregando fotos...
-            </div>
-          ) : photos.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              Nenhuma foto neste álbum ainda
-            </div>
-          ) : (
-            <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
-              {photos.map((photo) => (
-                <div key={photo.id} className="relative group">
-                  <img
-                    src={`http://localhost:3001/uploads/${photo.filename}`}
-                    alt={photo.originalName}
-                    className="w-full h-32 object-cover rounded-lg"
-                  />
+          {photos.length > 0 && (
+            <div className="mt-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {photos.length} foto(s)
+                </h3>
+
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleViewModeChange("grid")}
+                    className={`px-4 py-2 rounded-md font-medium ${
+                      viewMode === "grid"
+                        ? "bg-blue-600 text-white"
+                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                    }`}
+                  >
+                    Grade
+                  </button>
+                  <button
+                    onClick={() => handleViewModeChange("table")}
+                    className={`px-4 py-2 rounded-md font-medium ${
+                      viewMode === "table"
+                        ? "bg-blue-600 text-white"
+                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                    }`}
+                  >
+                    Tabela
+                  </button>
                 </div>
-              ))}
+              </div>
+
+              {viewMode === "grid" ? (
+                <PhotoGrid photos={photos} onDelete={openDeletePhotoModal} />
+              ) : (
+                <PhotoTable photos={photos} onDelete={openDeletePhotoModal} />
+              )}
             </div>
           )}
         </div>
@@ -183,6 +232,18 @@ export const AlbumDetailPage = () => {
         onConfirm={handleDelete}
         title="Deletar Álbum"
         message={`Tem certeza que deseja deletar o álbum "${album.title}"? Esta ação não pode ser desfeita.`}
+        isLoading={isSubmitting}
+      />
+
+      <ConfirmModal
+        isOpen={isDeletePhotoModalOpen}
+        onClose={() => {
+          setIsDeletePhotoModalOpen(false);
+          setPhotoToDelete(null);
+        }}
+        onConfirm={handleDeletePhoto}
+        title="Deletar Foto"
+        message={`Tem certeza que deseja deletar a foto "${photoToDelete?.originalName}"? Esta ação não pode ser desfeita.`}
         isLoading={isSubmitting}
       />
     </div>
